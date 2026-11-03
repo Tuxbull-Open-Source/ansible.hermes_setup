@@ -1,6 +1,6 @@
 # Manual Hermes Setup on Rocky Linux 10
 
-This document shows the manual equivalent of the `joe-speedboat.hermes_setup` role. It is useful for audits, troubleshooting, and understanding exactly what the role automates.
+This document shows the manual equivalent of the `tuxbull.hermes_setup` role. It is useful for audits, troubleshooting, and understanding exactly what the role automates.
 
 ## 1. Update Rocky Linux 10
 

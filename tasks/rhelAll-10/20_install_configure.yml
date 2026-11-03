@@ -23,6 +23,34 @@
     group: "{{ hermes_group }}"
     mode: '0700'
 
+- name: Discover the Hermes installer-managed Python runtime
+  ansible.builtin.shell: >-
+    awk 'NR == 2 { sub(/^exec /, ""); print $1; exit }'
+    {{ (hermes_project_path ~ '/.hermes/bin/hermes') | quote }}
+  args:
+    executable: /bin/bash
+  register: hermes_runtime_python_command
+  changed_when: false
+
+- name: Store Hermes installer-managed Python runtime path
+  ansible.builtin.set_fact:
+    hermes_runtime_python_path: "{{ hermes_runtime_python_command.stdout | trim }}"
+
+- name: Verify Hermes installer-managed Python runtime
+  ansible.builtin.stat:
+    path: "{{ hermes_runtime_python_path }}"
+  register: hermes_runtime_python_stat
+
+- name: Fail when Hermes installer runtime cannot be discovered
+  ansible.builtin.assert:
+    that:
+      - hermes_runtime_python_path | length > 0
+      - hermes_runtime_python_stat.stat.exists
+      - hermes_runtime_python_stat.stat.executable
+    fail_msg: >-
+      The Hermes installer runtime is unavailable. Expected an executable Python
+      path in {{ hermes_project_path }}/.hermes/bin/hermes.
+
 - name: Configure Hermes Codex provider default
   ansible.builtin.command: >-
     runuser -u {{ hermes_user }} -- env HOME={{ hermes_home }}
@@ -85,9 +113,7 @@
   loop:
     - username
     - password_hash
-    - password
     - secret
-    - session_ttl_seconds
   register: hermes_dashboard_auth_current
   no_log: true
   changed_when: false
@@ -110,9 +136,7 @@
   loop:
     - { key: username, value: "{{ hermes_dashboard_auth_username }}" }
     - { key: password_hash, value: "{{ hermes_dashboard_auth_password_hash }}" }
-    - { key: password, value: "{{ hermes_dashboard_auth_password }}" }
     - { key: secret, value: "{{ hermes_dashboard_auth_secret }}" }
-    - { key: session_ttl_seconds, value: "{{ hermes_dashboard_auth_ttl_seconds }}" }
   loop_control:
     index_var: hermes_dashboard_auth_index
   no_log: true
@@ -141,9 +165,7 @@
   loop:
     - { key: username, value: "{{ hermes_dashboard_auth_username }}" }
     - { key: password_hash, value: "{{ hermes_dashboard_auth_password_hash }}" }
-    - { key: password, value: "{{ hermes_dashboard_auth_password }}" }
     - { key: secret, value: "{{ hermes_dashboard_auth_secret }}" }
-    - { key: session_ttl_seconds, value: "{{ hermes_dashboard_auth_ttl_seconds }}" }
   loop_control:
     index_var: hermes_dashboard_auth_index
   no_log: true
@@ -153,6 +175,58 @@
     - hermes_dashboard_enabled | bool
     - item.value | string | length > 0
     - hermes_dashboard_auth_current.results[hermes_dashboard_auth_index].rc != 0 or hermes_dashboard_auth_current.results[hermes_dashboard_auth_index].stdout | trim != item.value | string | trim
+
+- name: Check Hermes config checksum before plaintext dashboard password update
+  ansible.builtin.stat:
+    path: "{{ hermes_config_dir }}/config.yaml"
+    get_checksum: true
+  register: hermes_dashboard_password_config_before
+  no_log: true
+  when:
+    - hermes_dashboard_enabled | bool
+    - hermes_dashboard_auth_password | length > 0
+
+- name: Configure plaintext Hermes dashboard password without exposing it
+  ansible.builtin.command:
+    argv:
+      - runuser
+      - -u
+      - "{{ hermes_user }}"
+      - --
+      - env
+      - "HOME={{ hermes_home }}"
+      - "{{ hermes_bin_path }}"
+      - config
+      - set
+      - dashboard.basic_auth.password
+      - "{{ hermes_dashboard_auth_password }}"
+  changed_when: false
+  no_log: true
+  when:
+    - hermes_dashboard_enabled | bool
+    - hermes_dashboard_auth_password | length > 0
+
+- name: Check Hermes config checksum after plaintext dashboard password update
+  ansible.builtin.stat:
+    path: "{{ hermes_config_dir }}/config.yaml"
+    get_checksum: true
+  register: hermes_dashboard_password_config_after
+  no_log: true
+  when:
+    - hermes_dashboard_enabled | bool
+    - hermes_dashboard_auth_password | length > 0
+
+- name: Restart dashboard when plaintext password configuration changed
+  ansible.builtin.set_fact:
+    hermes_dashboard_plaintext_password_changed: true
+  changed_when: >-
+    hermes_dashboard_password_config_before.stat.checksum !=
+    hermes_dashboard_password_config_after.stat.checksum
+  notify: restart Hermes dashboard
+  no_log: true
+  when:
+    - hermes_dashboard_enabled | bool
+    - hermes_dashboard_auth_password | length > 0
 
 - name: Print manual Codex authentication instructions
   ansible.builtin.debug:

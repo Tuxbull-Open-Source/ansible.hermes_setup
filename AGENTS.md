@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This file is the agent-facing contribution and verification guide for `joe-speedboat.hermes_setup`.
+This file is the agent-facing contribution and verification guide for `tuxbull.hermes_setup`.
 It follows the open `AGENTS.md` convention described at [agents.md](https://agents.md/): keep repository context, commands, conventions, and verification requirements in a predictable Markdown file at the repository root.
 
 ## Project overview
@@ -57,7 +57,7 @@ ANSIBLE_ROLES_PATH=/home/hermes/work ansible-playbook tests/nginx_tasks_syntax.y
 git diff --check
 ```
 
-Use the exact controller environment and role path that will execute the consumer playbook, especially for Rundeck/AWX. A local checkout test does not prove that `/etc/ansible/roles/joe-speedboat.hermes_setup` or the controller's collections are current.
+Use the exact controller environment and role path that will execute the consumer playbook, especially for Rundeck/AWX. A local checkout test does not prove that `/etc/ansible/roles/tuxbull.hermes_setup` or the controller's collections are current.
 
 For a real target, use a disposable Rocky/RHEL lab host and a separate harness. The minimum real-run sequence is:
 
