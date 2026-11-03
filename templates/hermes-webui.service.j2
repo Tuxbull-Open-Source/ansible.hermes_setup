@@ -11,7 +11,7 @@ WorkingDirectory={{ hermes_webui_app_dir }}
 EnvironmentFile={{ hermes_webui_app_dir }}/.env
 Environment=PYTHONUNBUFFERED=1
 Environment=HERMES_WEBUI_FOREGROUND=1
-ExecStart={{ hermes_project_path }}/venv/bin/python {{ hermes_webui_app_dir }}/bootstrap.py --no-browser --foreground --host {{ hermes_webui_host }} {{ hermes_webui_port }}{{ (hermes_webui_extra_args | length > 0) | ternary(' ' + hermes_webui_extra_args, '') }}
+ExecStart={{ hermes_runtime_python_path }} {{ hermes_webui_app_dir }}/bootstrap.py --no-browser --foreground --host {{ hermes_webui_host }} {{ hermes_webui_port }}{{ (hermes_webui_extra_args | length > 0) | ternary(' ' + hermes_webui_extra_args, '') }}
 Restart=on-failure
 RestartSec=5s
 TimeoutStopSec=20s

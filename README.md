@@ -33,15 +33,15 @@ Install the role with one of these methods.
 1. Direct GitHub checkout into a Galaxy-style role path:
 
 ```bash
-git clone https://github.com/joe-speedboat/ansible.hermes_setup.git /etc/ansible/roles/joe-speedboat.hermes_setup
+git clone https://github.com/Tuxbull-Open-Source/ansible.hermes_setup.git /etc/ansible/roles/tuxbull.hermes_setup
 ```
 
-For project-local checkouts, clone it into `roles/joe-speedboat.hermes_setup` below your Ansible project.
+For project-local checkouts, clone it into `roles/tuxbull.hermes_setup` below your Ansible project.
 
 2. Ansible Galaxy:
 
 ```bash
-ansible-galaxy role install joe-speedboat.hermes_setup
+ansible-galaxy role install tuxbull.hermes_setup
 ```
 
 ## Role Variables
@@ -150,7 +150,7 @@ hermes_bootstrap_include_auth: false
   hosts: hermes_servers
   become: true
   roles:
-    - role: joe-speedboat.hermes_setup
+    - role: tuxbull.hermes_setup
       vars:
         configure_codex: true
         hermes_gateway_enabled: true
@@ -179,7 +179,7 @@ Use two DNS names for one Hermes instance when both browser interfaces are enabl
   hosts: hermes_servers
   become: true
   roles:
-    - role: joe-speedboat.hermes_setup
+    - role: tuxbull.hermes_setup
       vars:
         hermes_gateway_enabled: true
         hermes_dashboard_enabled: true
@@ -228,7 +228,7 @@ Use one Linux user, one loopback dashboard port, and one nginx vhost per Hermes 
   tasks:
     - name: Install Hermes instance
       ansible.builtin.include_role:
-        name: joe-speedboat.hermes_setup
+        name: tuxbull.hermes_setup
       loop: "{{ hermes_instances }}"
       loop_control:
         loop_var: hermes_instance
@@ -381,7 +381,7 @@ sudo -iu hermes hermes pairing approve telegram <CODE>
 
 ## Manual Setup Documentation
 
-For a copy/paste manual runbook that mirrors this role, see [`docs/manual-setup-rocky10.md`](https://github.com/joe-speedboat/ansible.hermes_setup/blob/master/docs/manual-setup-rocky10.md).
+For a copy/paste manual runbook that mirrors this role, see [`docs/manual-setup-rocky10.md`](https://github.com/Tuxbull-Open-Source/ansible.hermes_setup/blob/master/docs/manual-setup-rocky10.md).
 
 ## License
 

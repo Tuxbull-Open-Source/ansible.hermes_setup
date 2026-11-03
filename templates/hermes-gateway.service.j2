@@ -6,10 +6,9 @@ StartLimitIntervalSec=0
 
 [Service]
 Type=simple
-ExecStart={{ hermes_project_path }}/venv/bin/python -m hermes_cli.main gateway run --replace{{ (hermes_gateway_extra_args | length > 0) | ternary(' ' + hermes_gateway_extra_args, '') }}
+ExecStart={{ hermes_bin_path }} gateway run --replace{{ (hermes_gateway_extra_args | length > 0) | ternary(' ' + hermes_gateway_extra_args, '') }}
 WorkingDirectory={{ hermes_project_path }}
-Environment="PATH={{ hermes_project_path }}/venv/bin:{{ hermes_project_path }}/node_modules/.bin:{{ hermes_home }}/.hermes/node/bin:{{ hermes_home }}/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-Environment="VIRTUAL_ENV={{ hermes_project_path }}/venv"
+Environment="PATH={{ hermes_project_path }}/.hermes/bin:{{ hermes_project_path }}/node_modules/.bin:{{ hermes_home }}/.hermes/node/bin:{{ hermes_home }}/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 Environment="HERMES_HOME={{ hermes_config_dir }}"
 Restart=always
 RestartSec=5

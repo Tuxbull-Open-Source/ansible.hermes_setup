@@ -1,6 +1,25 @@
 # Changelog
 
-## Unreleased
+## v1.3.3 - 2026-11-03
+
+### Fixed
+
+- Use the Hermes installer-managed executable and Python runtime in gateway,
+  dashboard, and WebUI systemd units instead of assuming a legacy `venv/`.
+- Make plaintext dashboard-password reconciliation detectable without logging the
+  password, and avoid writing the default disabled session TTL repeatedly.
+- Align agent-facing role references with the `tuxbull.hermes_setup` Galaxy
+  identity.
+
+### Verified
+
+- Fresh Rocky Linux 10 disposable-lab converges for agent-only, dashboard-only,
+  WebUI-only, and combined-interface topologies.
+- Application authentication rejects invalid credentials and accepts lab-only
+  valid credentials for both dashboard and WebUI.
+- Final same-input combined role converge: `changed=0 unreachable=0 failed=0`.
+
+## v1.3.2 - 2026-10-28
 
 - Synchronizes Rocky Node.js packages (`nodejs`, `nodejs-libs`, `npm`, `c-ares`) before Playwright/npm execution and validates `node --version`/`npm --version` as the Hermes user.
 - Fixes the `ansible_enable: true` verification path to use the installer's active `current/bin/ansible` runtime directly instead of requiring a profile file that may be missing after a partial installation.
